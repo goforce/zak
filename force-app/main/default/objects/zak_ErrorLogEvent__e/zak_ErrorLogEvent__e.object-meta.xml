@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <deploymentStatus>Deployed</deploymentStatus>
+    <description>Platform event used to log exceptions, errors, warnings or any other info. User zakErrorLog log methods to publish events.</description>
+    <eventType>HighVolume</eventType>
+    <label>zakErrorLog</label>
+    <pluralLabel>zakErrorLogs</pluralLabel>
+    <publishBehavior>PublishImmediately</publishBehavior>
+</CustomObject>
