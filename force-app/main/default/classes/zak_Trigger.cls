@@ -1,15 +1,24 @@
 // trigger handler to be called in triggers. it accepts implementation of the trigger handler.
 public class zak_Trigger {
 
+    // runs trigger handlers defined per sobject type in order of label
     public static void run() {
-        for ( zak_TriggerHandler__mdt m : [select DeveloperName, SObject__c from zak_TriggerHandler__mdt] ) {
-            if ( m.SObject__c == 'Account' ) {
+
+        // not allowed to run not in Trigger context
+        if ( ! ( Test.isRunningTest() || Trigger.isExecuting ) ) {
+            throw new TriggerException( 'not allowed' );
+        }
+
+        zak_TriggerContext ctx = new zak_TriggerContext();
+        for ( zak_TriggerHandler__mdt m : [select DeveloperName, SObject__c from zak_TriggerHandler__mdt order by MasterLabel] ) {
+            if ( m.SObject__c == String.valueOf( ctx.sObjectType ) ) {
                 zak_TriggerHandler h = (zak_TriggerHandler) Type.forName( m.DeveloperName );
                 if ( h <> null ) {
-                    run( h );
+                    run( h, ctx );
                 }
             }
         }
+
     }
 
     public static void run( zak_TriggerHandler h ) {
@@ -19,6 +28,12 @@ public class zak_Trigger {
             throw new TriggerException( 'not allowed' );
         }
 
+        zak_TriggerContext ctx = new zak_TriggerContext();
+        run( h, ctx );
+    }
+
+    public static void run( zak_TriggerHandler h, zak_TriggerContext ctx ) {
+
         // bypasses and actions are reset on root run
         // root run is first invocation of trigger on empty stack of trigger invocations
         if ( stack.isEmpty() ) {
@@ -26,7 +41,6 @@ public class zak_Trigger {
         }
 
         // check is run allowed and not bypassed
-        zak_TriggerContext ctx = new zak_TriggerContext();
         if ( addToStack( ctx ) ) {
             // context is object containing full information about invocation of the trigger
             try {
