@@ -1,11 +1,19 @@
 # zak
 
+PROJECT POSTED FOR PEER REVIEWS ONLY.
+
+
 salesforce apex jump-start kit
 
-## Dev, Build and Test
 
-## Resources
 
-## Description of Files and Directories
+## features
+- utility methods
+- error logging
+- trigger framework
+- unit test framework
+- internals
 
-## Issues
+## roadmap
+
+## issues
