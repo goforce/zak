@@ -1,4 +1,3 @@
-.project
-.settings
-salesforce.schema
-Referenced Packages
+.sfdx
+.vscode
+.DS_Store
