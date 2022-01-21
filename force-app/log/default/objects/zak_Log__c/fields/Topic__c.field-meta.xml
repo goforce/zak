@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Topic__c</fullName>
+    <description>Topic from the event.</description>
+    <externalId>false</externalId>
+    <label>Topic</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>ERR</fullName>
+                <default>true</default>
+                <label>ERR</label>
+            </value>
+            <value>
+                <fullName>WARN</fullName>
+                <default>false</default>
+                <label>WARN</label>
+            </value>
+            <value>
+                <fullName>INFO</fullName>
+                <default>false</default>
+                <label>INFO</label>
+            </value>
+            <value>
+                <fullName>PERF</fullName>
+                <default>false</default>
+                <label>PERF</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>
