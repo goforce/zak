@@ -425,7 +425,7 @@ public inherited sharing class zak_Trigger {
         List<HandlerDef> defs = handlers.get( t );
         if ( defs == null ) {
             defs = new List<HandlerDef>();
-            for ( zak_TriggerHandler__mdt m : [select SObject__c, HandlerClass__c, RecordType__c
+            for ( zak_TriggerHandler__mdt m : [select SObject__c, HandlerClass__c, RecordType__c, SequenceNumber__c
                                                  from zak_TriggerHandler__mdt
                                                 where SObject__c = :String.valueOf( t )
                                              order by SequenceNumber__c] ) {
