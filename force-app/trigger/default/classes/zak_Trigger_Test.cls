@@ -98,12 +98,28 @@ private without sharing class zak_Trigger_Test {
     public class AccountTriggerHandler extends zak_Trigger.Handler {
         public override void beforeInsert( List<SObject> scope ) {
             actions.add( 'account.before.insert' );
+            LocalService ls = zak_Trigger.get( LocalService.class );
+            System.assertEquals( 'local', ls.name );
+            ls.init( 'account' );
+            System.assertEquals( 'account', ls.name );
+            GlobalService gs = zak_Trigger.get( GlobalService.class );
+            System.assertEquals( 'global', gs.name );
+            gs.init( 'account' );
+            System.assertEquals( 'account', gs.name );
             List<Contact> contacts = new List<Contact>{ new Contact( LastName = 'first' ), new Contact( LastName = 'second' ) };
             zak_Trigger.run( ContactTriggerHandler.class, zak_Trigger.BeforeInsert.class, contacts, null );
             zak_Trigger.run( ContactTriggerHandler.class, zak_Trigger.AfterInsert.class, contacts, null );
         }
         public override void afterInsert( List<SObject> scope ) {
             actions.add( 'account.after.insert' );
+            LocalService ls = zak_Trigger.get( LocalService.class );
+            System.assertEquals( 'local', ls.name );
+            ls.init( 'account' );
+            System.assertEquals( 'account', ls.name );
+            GlobalService gs = zak_Trigger.get( GlobalService.class );
+            System.assertEquals( 'global', gs.name );
+            gs.init( 'account' );
+            System.assertEquals( 'account', gs.name );
         }
         public override void beforeUpdate( List<SObject> scope, List<SObject> olds ) {
             actions.add( 'account.before.update' );
@@ -131,6 +147,12 @@ private without sharing class zak_Trigger_Test {
     public class ContactTriggerHandler extends zak_Trigger.Handler {
         public override void beforeInsert( List<SObject> scope ) {
             actions.add( 'contact.before.insert' );
+            LocalService ls = zak_Trigger.get( LocalService.class );
+            System.assertEquals( 'local', ls.name );
+            ls.init( 'contact' );
+            System.assertEquals( 'contact', ls.name );
+            GlobalService gs = zak_Trigger.get( GlobalService.class );
+            System.assertEquals( 'account', gs.name );
         }
         public override void afterInsert( List<SObject> scope ) {
             actions.add( 'contact.after.insert' );
@@ -161,6 +183,34 @@ system.debug( 'in run recursive' );
             actions.add( 'last.sobject.' + zak_Trigger.lastSObject() );
             actions.add( 'is.first.' + zak_Trigger.isFirstTrigger() );
             zak_Trigger.run( RecursiveTriggerHandler.class, zak_Trigger.AfterUndelete.class, scope, null );
+        }
+    }
+
+    public class LocalService implements zak_Trigger.LocalService {
+        public String name;
+        public LocalService() {
+            name = 'local';
+        }
+        public LocalService init( String name ) {
+            this.name = name;
+            return this;
+        }
+        public void finish() {
+            name = null;
+        }
+    }
+
+    public class GlobalService implements zak_Trigger.GlobalService {
+        public String name;
+        public GlobalService() {
+            name = 'global';
+        }
+        public GlobalService init( String name ) {
+            this.name = name;
+            return this;
+        }
+        public void finish() {
+            name = null;
         }
     }
 

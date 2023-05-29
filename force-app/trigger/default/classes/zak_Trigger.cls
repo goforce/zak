@@ -41,11 +41,32 @@ public inherited sharing class zak_Trigger {
             }
             throw e;
         } finally {
+            if ( t.services <> null ) {
+                if ( logDebug ) {
+                    zak_Trigger.debug( 'FINISH LOCAL SERVICES', 'local services: ' + t.services.keySet() );
+                }
+                for ( Object s : t.services.values() ) {
+                    ( (LocalService) s ).finish();
+                }
+            }
+            if ( t.parent === zak_Trigger.ROOT ) {
+                if ( zak_Trigger.ROOT.services <> null ) {
+                    if ( logDebug ) {
+                        zak_Trigger.debug( 'FINISH GLOBAL SERVICES', 'global services: ' + zak_Trigger.ROOT.services.keySet() );
+                    }
+                    for ( Object s : zak_Trigger.ROOT.services.values() ) {
+                        ( (GlobalService) s ).finish();
+                    }
+                }
+            }
             if ( logDebug ) {
                 zak_Trigger.debug( 'TRIGGER FINISH', ''.leftPad( zak_Trigger.depth(), '<' ) + ' ' + t.sObjectType + ' ' + t.operation );
             }
             if ( pl <> null ) {
                 pl.finish();
+            }
+            if ( t.parent === zak_Trigger.ROOT ) {
+                zak_ErrorLog.flush();
             }
             zak_Trigger.activeTrigger = t.parent;
         }
@@ -68,7 +89,7 @@ public inherited sharing class zak_Trigger {
         if ( scope <> null && ! scope.isEmpty() ) {
             t.sObjectType = scope[0].getSObjectType();
         }
-    zak_Trigger.run( handler, t );
+        zak_Trigger.run( handler, t );
     }
 
     public interface BeforeInsert { void beforeInsert( List<SObject> scope ); }
@@ -185,6 +206,45 @@ public inherited sharing class zak_Trigger {
     public static SObjectType lastSObject() {
         return zak_Trigger.activeTrigger?.parent?.sObjectType;
     }
+
+    // ------------------------------ services ------------------------------
+
+    public interface LocalService {
+        void finish();
+    }
+
+    public interface GlobalService {
+        void finish();
+    }
+
+    private Map<Type,Object> services;
+
+    public static Object get( Type t ) {
+        if ( zak_Trigger.ROOT == null || zak_Trigger.activeTrigger == null ) {
+            throw new TriggerException( 'available only within context of trigger' );
+        }
+        zak_Trigger home;
+        if ( GlobalService.class.isAssignableFrom( t ) ) {
+            home = zak_Trigger.ROOT;
+        } else if ( LocalService.class.isAssignableFrom( t ) ) {
+            home = zak_Trigger.activeTrigger;
+        }
+        if ( home == null ) {
+            throw new TriggerException( 'service should implement interface' );
+        }
+        if ( home.services == null ) {
+            Object s = t.newInstance();
+            home.services = new Map<Type,Object>{ t => s };
+            return s;
+        }
+        Object s = home.services.get( t );
+        if ( s == null ) {
+            s = t.newInstance();
+            home.services.put( t, s );
+        }
+        return s;
+    }
+
 
     // ------------------------------ utility methods ------------------------------
 
@@ -370,10 +430,6 @@ public inherited sharing class zak_Trigger {
                     }
                 }
             }
-        }
-        // finalise trigger
-        if ( this.parent === ROOT ) {
-            zak_ErrorLog.flush();
         }
     }
 
