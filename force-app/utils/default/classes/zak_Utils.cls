@@ -65,15 +65,64 @@ public inherited sharing virtual class zak_Utils {
         return s == null ? '' : s.trim();
     }
 
-    // check that picklist value is selected in multi-picklist this is case insensitive
-    public static Boolean isSelected( String fieldValue, String value ) {
-        if ( fieldValue == null || value == null ) return false;
-        Integer fl = fieldValue.length();
+    // check that value set contains value. this is case insensitive
+    public static Boolean contains( String valueset, String value, String separator ) {
+        if ( valueset == null || value == null ) return false;
+        Integer fl = valueset.length();
         Integer l = value.length();
-        for ( Integer i = fieldValue.indexOfIgnoreCase( value ); i >= 0; i = fieldValue.indexOfIgnoreCase( value, ++i ) ) {
-            if ( ( i == 0 || fieldValue.mid( i - 1, 1 ) == ';' ) && ( ( i + l ) == fl || fieldValue.mid( i + l, 1 ) == ';'  ) ) return true;
+        for ( Integer i = valueset.indexOfIgnoreCase( value ); i >= 0; i = valueset.indexOfIgnoreCase( value, ++i ) ) {
+            if ( ( i == 0 || valueset.mid( i - 1, 1 ) == separator ) && ( ( i + l ) == fl || valueset.mid( i + l, 1 ) == separator  ) ) return true;
         }
         return false;
+    }
+
+    // remove value from value set. this is case insensitive
+    // returns null if value is only value in value set
+    public static String remove( String valueset, String value, String separator ) {
+        if ( valueset == null || value == null ) return valueset;
+        Integer fl = valueset.length();
+        Integer l = value.length();
+        for ( Integer i = valueset.indexOfIgnoreCase( value ); i >= 0; i = valueset.indexOfIgnoreCase( value, ++i ) ) {
+            if ( i == 0 ) {
+                if ( valueset.mid( i + l, 1 ) == separator ) {
+                    return valueset.substring( 0, i ) + valueset.substring( i + l + 1 );
+                } else if ( ( i + l ) == fl ) {
+                    return null; // return null value if value is only one selected
+                }
+            } else if ( valueset.mid( i - 1, 1 ) == separator ) {
+                if ( valueset.mid( i + l, 1 ) == separator ) {
+                    return valueset.substring( 0, i ) + valueset.substring( i + l + 1 );
+                } else if ( ( i + l ) == fl ) {
+                    return valueset.substring( 0, i - 1 );
+                }
+            }
+        }
+        return valueset;
+    }
+
+    // adds value to string value set. this is case sensitive
+    public static String add( String valueset, String value, String separator ) {
+        if ( value == null ) return valueset;
+        if ( valueset == null ) return value;
+        if ( ! contains( valueset, value, separator ) ) {
+            return valueset + separator + value;
+        }
+        return valueset;
+    }
+
+    private static final String MSP_SEPARATOR = ';';
+
+    // returns true if value is selected in the multi-picklist, false otherwise
+    public static Boolean contains( String fieldValue, String value ) {
+        return contains( fieldValue, value, MSP_SEPARATOR );
+    }
+    // remove value from multi-picklist, returns null if it is last selected value
+    public static String remove( String fieldValue, String value ) {
+        return remove( fieldValue, value, MSP_SEPARATOR );
+    }
+    // adds value to multi-picklist
+    public static String add( String fieldValue, String value ) {
+        return add( fieldValue, value, MSP_SEPARATOR );
     }
 
     // ------------------------- date/time related methods ------------------------- //

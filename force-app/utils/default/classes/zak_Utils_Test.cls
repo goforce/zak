@@ -60,8 +60,14 @@ private without sharing class zak_Utils_Test {
         System.assertEquals( 10, zak_Utils.genString( 10 ).length(), 'genString failed' );
         System.assertEquals( 10, zak_Utils.genLower( 10 ).length(), 'genLower failed' );
 
-        System.assertEquals( true, zak_Utils.isSelected( 'teSta;teStb', 'testB' ), 'isSelected failed on true' );
-        System.assertEquals( false, zak_Utils.isSelected( 'testa;testb', 'testc' ), 'isSelected failed on false' );
+        System.assertEquals( true, zak_Utils.contains( 'teSta;teStb', 'testB' ), 'contains failed on true' );
+        System.assertEquals( false, zak_Utils.contains( 'testa;testb', 'testc' ), 'contains failed on false' );
+        System.assertEquals( 'teSta', zak_Utils.remove( 'teSta;teStb', 'testB' ), 'remove failed on testB' );
+        System.assertEquals( 'teSta;testC', zak_Utils.remove( 'teSta;teStb;testC', 'tesTB' ), 'remove failed on tesTB' );
+        System.assertEquals( 'teSta;teStb', zak_Utils.remove( 'teSta;teStb;testC', 'teStc' ), 'remove failed on teStc' );
+        System.assertEquals( 'teSta;teStb;testC', zak_Utils.remove( 'teSta;teStb;testC', 'teStD' ), 'remove failed on teStD' );
+        System.assertEquals( 'teSta;teStb', zak_Utils.add( 'teSta;teStb', 'testB' ), 'add failed on testB' );
+        System.assertEquals( 'teSta;teStb;testC', zak_Utils.add( 'teSta;teStb', 'testC' ), 'add failed on testC' );
 
         // dates and time zones
         System.assertEquals( Time.newInstance( 09, 10, 11, 0 ), zak_Utils.parseTime( '09:10:11' ), 'time parsing failed' );
